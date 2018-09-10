@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="sesoc.global.escape.dao.ItemsDAO">	
+	<select id = "selectItemsMatchingTheme" parameterType="string" resultType="Items">
+		select no, type, theme, json_file, icon_file, scale
+		from items
+		where theme = #{theme}
+		and type in('wall', 'floor', 'furniture')
+		and json_file != 'plane'
+	</select>
+	
+	<!-- 17.9.27 수정 -->
+	<select id = "getSecondItems" resultType = "Items">
+		select no, type, theme, json_file, icon_file, scale
+		from items
+		where theme = #{theme}
+		and type not in('wall', 'furniture', 'detail', 'floor') 
+	</select>
+	
+	<select id = "getTypeJSON" parameterType = "Items" resultType = "Items">
+		select no, json_file
+		from items
+		where theme = #{theme}
+		and type = #{type}
+	</select>
+	
+	<select id = "selectOneItem" parameterType = "Items" resultType = "Items">
+		select no, type, json_file, scale, canvas_availability, icon_file, trick_type
+		from items
+		where no = #{no}
+	</select>
+	
+	<select id = "selectMatchingItem" parameterType = "Items" resultType = "Items">
+		select no, type, maching_item
+		from items
+		where no = #{no}
+	</select>
+	
+	
+	<!-- Set_Item -->
+	<!-- insert -->
+	<insert id="insertSetItems" parameterType="Set_items">
+		insert into set_items
+		(no, item_name, item_no, map_no, position, rotation, setting, RETRACTABLE)
+		values(
+		si_seq.nextval, #{item_name}, #{item_no}, #{map_no}, #{position}, #{rotation}, #{setting}, #{retractable}
+		)
+	</insert>
+	
+	<!-- update -->
+	<update id = "updateSetItems" parameterType="Set_Items">
+	update set_items
+	set
+	<choose>
+	<when test="matching_item != 0">
+		matching_item = #{matching_item}
+	</when>
+	<when test="rotation != null">
+		rotation = #{rotation}
+	</when>
+	<when test="position != null">
+		,position = #{position}
+	</when>
+	<when test="setting != null">
+		,setting = #{setting}
+	</when>
+	<when test="retractable != null">
+		retractable = #{retractable}
+	</when>
+	</choose>
+	where map_no = #{map_no}
+	and item_no = #{item_no}
+	and item_name = #{item_name}
+	</update>
+	
+	<!-- select -->
+	<select id = "selectSetItem" parameterType="Set_Items" resultType="Set_Items">
+		select * 
+		from set_items
+		where map_no = #{map_no}
+		<if test="item_name != null">
+			and item_name = #{item_name}
+		</if>
+	</select>
+	
+	<!-- delete -->
+	<delete id = "deleteSetItems">
+		delete from set_items
+		where map_no = #{map_no}
+		and item_name = #{item_name}
+	</delete>
+	
+	<!-- insert -->
+	<insert id = "insertHint" parameterType="string">
+		insert into canvas
+		values(canvas_seq.nextval, #{fullpath})
+	</insert>
+	
+	<!-- delete -->
+	<delete id = "deleteHint" parameterType="int">
+		delete from canvas where no = #{no}
+	</delete>
+	
+	<!-- select -->
+	<select id="selectHint" parameterType="Set_Items" resultType="Set_Items">
+		select no "canvas_no", img_file
+		from canvas
+		where 
+		<if test="no != 0">
+		no = #{no}
+		</if>
+		<if test="fullPath != null">
+		img_file = #{fullPath}
+		</if>
+	</select>
+	
+	<!-- 17.9.29 trick -->
+	<insert id="insertTrick" parameterType = "Items">
+		insert into trick
+		(no, map_no, si_no, content, solved)
+		values
+		(trick_seq.nextval, #{map_no}, #{SI_no}, #{content}, #{solved})
+		
+	</insert>
+</mapper>

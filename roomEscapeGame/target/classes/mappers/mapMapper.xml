@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="sesoc.global.escape.dao.MapDAO">	
+
+	<!-- 17.9.27 수정	 -->
+	<insert id="insertRoomMap" parameterType="RoomMap">
+		insert into map(
+			no, user_id, title, theme, inputdate, content
+		) values(
+			map_seq.nextval, #{user_id}, #{title}, #{theme}, SYSDATE , #{content}
+		)
+	</insert>
+	
+	
+	<select id = "selectRoomMap" parameterType="RoomMap" resultType="RoomMap">
+		select no, user_id, title, theme, inputdate
+		from map
+		
+		where
+		<if test="no != 0">
+			no = #{no} 
+		</if>
+		<if test="title != null">
+			title = #{title}
+		</if>
+		and user_id = #{user_id}
+	</select>
+	
+	<!-- 17.9.27 수정 -->
+	<delete id="deleteMap" parameterType = "int">
+		delete from map
+		where no=#{no}
+	</delete>
+	
+	<select id = "selectAllMap" parameterType="RoomMap" resultType="RoomMap">
+		select * from map where user_id = #{user_id}
+	</select>
+	<select id="getExistingMap" resultType="RoomMap">
+		SELECT * FROM map
+	</select>
+	
+	<update id="mapNo_update" parameterType="int">
+		update room set
+		map_no = #{map_no}
+	</update>
+</mapper>

@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="sesoc.global.escape.dao.RoomDAO">	
+	<select id="selectNextRoomNo" resultType="int">
+	select room_seq.nextval from dual
+	</select>
+
+	<insert id="insertRoom" parameterType="Room">
+	insert into room(no
+	<if test="master_id != null">
+		, master_id
+	</if>
+	<if test="title != null">
+		, title
+	</if>
+	<if test="room_pw != null">
+		, room_pw
+	</if>
+	<if test="map_no != null">
+		, map_no
+	</if>
+		, status
+		)
+	values(#{no}
+	<if test="master_id != null">
+		,#{master_id}
+	</if>
+	<if test="title != null">
+		, #{title}
+	</if>
+	<if test="room_pw != null">
+		, #{room_pw}
+	</if>
+	<if test="map_no != null">
+		, #{map_no}
+	</if>
+		, #{status}
+		)
+	</insert>
+	
+	<delete id="deleteRoom" parameterType="Room">
+	delete from room
+	where no = #{no}
+	</delete>
+	
+	<insert id="insertWaitingUser" parameterType="WaitingUser">
+	insert into users_inroom
+	values(waiting_users_seq.nextval, #{room_no}, #{user_id}, #{session_id})
+	</insert>
+	
+	<select id="selectWaitingUser" resultType="WaitingUser" parameterType="Room">
+	select * from users_inroom
+	where room_no = ${room_no}
+	</select>
+	
+	<delete id="deleteWaitingUser" parameterType="WaitingUser">
+	delete from users_inroom
+	where no = #{no}
+	</delete>
+	
+	<select id="selectAllRoom" parameterType="Map" resultType="Room">
+		select r.NO, r.MAP_NO, r.ROOM_PW, r.TITLE, count(r.no) as numberOfUsers, r.master_id, r.status, u.profile
+		from ROOM r, users_inroom w, users u
+		where r.NO = w.ROOM_NO and u.ID = r.MASTER_ID
+		<if test="selectedWord == 'roomName'">
+			<if test="searchWord != ''">
+				AND r.title = #{searchWord}
+			</if>
+		</if>
+		<if test="selectedWord == 'roomMaster'">
+			<if test="searchWord != ''">
+				AND r.master_id = #{searchWord}
+			</if>
+		</if>
+		group by r.NO, r.MAP_NO, r.ROOM_PW, r.TITLE, r.master_id, r.status, u.profile
+	</select>
+	
+	<select id="selectBySessionId" parameterType="WaitingUser" resultType="WaitingUser">
+		select r.no as room_no, r.MASTER_ID as user_id from users_inroom w, ROOM r
+		where
+		w.USER_ID = r.MASTER_ID
+		AND w.session_id = #{session_id}
+	</select>
+	<select id="findMaster" parameterType="String" resultType="User">
+		select master_id as id from room where no = #{roomNum}
+	</select>
+	
+	<select id="roomInfo" parameterType="String" resultType="Room">
+		select * from room where no = #{room_no}
+	</select>
+	
+	<select id="getURIInfo" parameterType="String" resultType="WaitingUser">
+		SELECT no, room_no FROM users_inroom WHERE user_id = #{user_id}
+	</select>
+</mapper>

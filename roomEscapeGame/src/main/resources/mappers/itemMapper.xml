@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="sesoc.global.escape.dao.ItemDAO">
+
+	<select id="selectObtain" parameterType="Items" resultType="Items">
+		select obtainable_si from trick where SI_no = #{SI_no}
+	</select>
+
+	<select id="selectMatchingItem" parameterType="Items" resultType="Items">
+		select si2.item_name, si2.matching_item
+		from set_items si1 join set_items si2 on(si2.no = si1.matching_item)
+		where si1.item_name = #{item_name}
+	</select>
+
+	<select id="selectClickItem" parameterType="Items" resultType="Items">
+		select i.no, i.type, i.icon_file, i.action_availability, i.trick_type, si.no SI_no, si.item_name, si.matching_item, si.retractable
+		from items i join set_items si on(i.no = si.item_no)
+		where si.item_name = #{item_name}
+	</select>
+	
+	<select id="solvedCheck" parameterType="Items" resultType="Items">
+		select no trick_no, content, si_no SI_no, canvas_no, solved
+		from trick
+		where si_no = #{SI_no}
+	</select>
+	
+	<select id="selectSiCanvas" parameterType="Items" resultType="Items">
+		select item_name
+		from set_items
+		where no = #{SI_no}
+	</select>
+	
+	<update id="updateSolved" parameterType="Items">
+		update trick
+		set solved = #{solved}
+		where no = #{trick_no}
+	</update>
+	
+	<insert id="insertCanvasInven" parameterType="Items">
+		insert into inventory values(inventory_seq.nextval, null, #{UIR_no}, #{canvas_no})
+	</insert>
+	
+	<insert id="insertSetItemInven" parameterType="Items">
+		insert into inventory values(inventory_seq.nextval, #{SI_no}, #{UIR_no}, null)
+	</insert>
+	
+	<select id="selectItemCanvas" parameterType="Items" resultType="Items">
+		select si.no SI_no, si.item_name, si.matching_item, c.no canvas_no, img_file
+		from set_items si join canvas c on(c.no = si.canvas_no)
+		where si.no = #{SI_no}
+	</select>
+	
+	<select id="matchingItem" parameterType="Items" resultType="Items">
+		select si.no SI_no, si.item_name, si.item_no no, si.matching_item, iv.no inven_no, si.canvas_no
+		from inventory iv join set_items si on(si.no = iv.set_item_no)
+		where iv.no = #{inven_no}
+	</select>
+	
+	<select id="matchingCanvas" parameterType="Items" resultType="Items">
+		select iv.no inven_no, iv.set_item_no SI_no, iv.UIR_no, c.img_file
+		from inventory iv join canvas c on(c.no = iv.canvas_no)
+		where iv.no = #{inven_no}
+	</select>
+
+	<select id="selectInventorySetItems" parameterType="Items" resultType="Items">
+		select iv.no inven_no, uir.user_id, iv.canvas_no, si.no SI_no, si.item_no no
+		from inventory iv join users_inRoom uir on(uir.no = iv.UIR_no) join set_items si on(iv.set_item_no = si.no) 
+		where uir.room_no = #{room_no}
+	</select>
+	
+	<!-- 0928 이은지 추가 -->
+	<select id="selectInventoryCanvas" parameterType="Items" resultType="Items">
+		select iv.no inven_no, uir.user_id, iv.canvas_no
+		from inventory iv join users_inRoom uir on(uir.no = iv.UIR_no) 
+		where uir.room_no = #{room_no} and not iv.canvas_no is null
+	</select>
+	
+	<select id="selectInvenCanvas" parameterType="Items" resultType="Items">
+		select *
+		from canvas
+		where canvas.no = #{canvas_no}
+	</select>
+	
+	<select id="selectInvenItems" parameterType="Items" resultType="Items">
+		select i.no no, type, json_file, icon_file, scale, si.no SI_no, item_name, matching_item
+		from set_items si join items i on(i.no = si.item_no)
+		where si.no = #{SI_no}
+	</select>
+	
+	<select id="selectTrickCheck" parameterType="Items" resultType="Items">
+		select si.no SI_no
+		from set_items si join items i on(i.no = si.item_no)
+		where si.item_name = #{item_name} and i.type = 'trick'
+	</select>
+	
+	<!-- 0928################## 은지 쿼리 수정 -->
+	<insert id="insertItem" parameterType="Inventory">
+		INSERT INTO inventory values (
+			inventory_seq.nextval, #{item_no}, #{UIR_no}, null
+		)
+	</insert>
+	<!-- ################################### -->
+	
+	<select id="itemInfo" parameterType="String" resultType="Items">
+		SELECT no FROM set_items where item_name = #{item_name}
+	</select>
+	
+	<select id="isExisted" parameterType="Inventory" resultType="int">
+		select count(u.user_id) from users_inroom u
+		left join inventory i on u.no = i.uir_no
+		left join set_items s on i.SET_ITEM_NO = s.ITEM_NO
+		where u.room_no = #{room_no} and s.ITEM_NAME = #{item_name}
+	</select>
+</mapper>
+

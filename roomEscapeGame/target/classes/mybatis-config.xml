@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration
+  PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+	<typeAliases>
+		<typeAlias type="sesoc.global.escape.vo.Users" alias="User"/>
+		<typeAlias type="sesoc.global.escape.vo.Room" alias="Room"/>
+		<typeAlias type="sesoc.global.escape.vo.WaitingUsers" alias="WaitingUser"/>
+		<typeAlias type="sesoc.global.escape.vo.RoomMap" alias="RoomMap"/>
+		<typeAlias type="sesoc.global.escape.vo.Items" alias="Items"/>
+		<typeAlias type="sesoc.global.escape.vo.Inventory" alias="Inventory"/>
+		<typeAlias alias="Set_Items" type="sesoc.global.escape.vo.Set_Items"/>
+	</typeAliases>
+	<mappers>
+		<mapper resource="mappers/userMapper.xml"/>
+		<mapper resource="mappers/roomMapper.xml"/>
+		<mapper resource="mappers/roommapMapper.xml"/>
+		<mapper resource="mappers/mapMapper.xml"/>
+		<mapper resource="mappers/itemsMapper.xml"/>
+		<mapper resource="mappers/itemMapper.xml"/>
+	</mappers>
+</configuration>

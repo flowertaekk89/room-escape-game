@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="sesoc.global.escape.dao.UserDAO">
+	<insert id="insertUser" parameterType="User">
+	insert into users values(#{id}, #{pw}, #{email}, #{name}, #{nickname}, #{profile})
+	</insert>
+	
+	<select id="selectId" parameterType="User" resultType="User">
+	select id, pw, email, name, nickname, profile from users where
+	<if test = "id != null">
+		id = #{id}
+	</if>
+	<if test = "pw != null">
+		and pw = #{pw}
+	</if>
+	<if test = "email != null">
+		and email = #{email}
+	</if>
+	<if test="nickname != null">
+		nickname = #{nickname}
+	</if>
+	</select>
+	
+	<select id="selectEmail" parameterType="User" resultType="User">
+	select id, email, name, nickname, profile from users where 
+	<if test = "email != null">
+		email = #{email}
+	</if>
+	<if test = "name != null">
+		and name = #{name}
+	</if>
+	</select>
+	
+	<select id="selectNickName" parameterType="User" resultType="User">
+	select id, pw, email, name, nickname, profile from users where nickname = #{nickname}
+	</select>
+		
+	<update id="updateUser" parameterType="User">
+	update users set 
+	<if test = "pw != null">
+		pw = #{pw}
+	</if>
+	<if test = "profile != null">
+		, profile = #{profile}
+	</if>
+	<if test = "email != null">
+		, email = #{email}
+	</if>
+	<if test = "nickname != null">
+		, nickname = #{nickname} 
+	</if>
+	where id = #{id}
+	</update>
+	
+	<select id="selectWaitingUser" resultType="WaitingUser" parameterType="Room">
+	select w.*, u.profile, u.nickname from users_inroom w, users u
+	where w.USER_ID = u.ID AND w.room_no = #{no}
+	</select>
+	
+	<delete id="deleteNormalUser" parameterType="string">
+		delete from users_inroom where session_id = #{sessionId}
+	</delete>
+
+	<select id="findUser" parameterType="WaitingUser" resultType="WaitingUser">
+		select w.*, u.NICKNAME from users_inroom w, users u
+		where
+		w.USER_ID = u.ID
+		AND session_id = #{session_id}
+	</select>
+	<select id="numberOfUsers" parameterType="string" resultType="int">
+		select count(*) from users_inroom
+		where ROOM_NO = (select room_no from users_inroom where SESSION_ID = #{sessionId})
+	</select>
+	<select id="findAllUserId" resultType="WaitingUser">
+		select user_id from users_inroom
+	</select>
+</mapper>
